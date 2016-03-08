@@ -13,7 +13,7 @@ using namespace std;
 /*
  贪心
  vi - k * speed >= di
- vi - di >= k * speed
+ vi - di >= k * speed 
  所以按照vi - di  排序
  */
 const int N = 100 + 10;
