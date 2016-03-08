@@ -43,6 +43,33 @@ dp[k][j-1] = -(sum[n-1] -sum[i-1])*sum[k-1] + G
 int Cross(int x1, int y1, int x2, int y2, int x3, int y3){
     return (x2-x1) * (y3-y1) - (y2-y1)*(x3-x1);
 }
+
+/*
+ 当斜率不是递增时，就要用到二分查找切点，
+ 虽然这里的斜率是递增的， 但是为了检验一下，所以写了个二分查找
+ */
+int find(int i, int j, int k, int l, int r){
+    if(l==r){
+        return q[l];
+    }
+    else if(l+1==r){
+        if((gety(q[r], j) - gety(q[l], j)) <= k * (getx(q[r]) - getx(q[l])))
+            return q[r];
+        return q[l];
+    }
+    else{
+        int mid = (l+r)>>1;
+        //比右边大
+        bool flag1 = (gety(q[mid+1], j) - gety(q[mid], j)) <= k * (getx(q[mid+1]) - getx(q[mid]));
+        //比左边大
+        bool flag2 = (gety(q[mid], j) - gety(q[mid-1], j)) <= k * (getx(q[mid]) - getx(q[mid-1]));
+        if(flag1)
+            return find(i,j,k,mid+1,r);
+        else if(!flag2)
+            return find(i,j,k,l,mid);
+        return q[mid];
+    }
+}
 int main(int argc, const char * argv[]) {
     
    
@@ -70,10 +97,11 @@ int main(int argc, const char * argv[]) {
             //第j次选择爆炸的地点肯定是j开始，这样前面的j-1次爆炸才有地方选择
             for(int i=j;i<n;++i){
                 int k = -(sum[n-1] - sum[i-1]);
-                while(head+1<tail && (gety(q[head+1],j)-gety(q[head],j)) <= k*(getx(q[head+1])-getx(q[head])))
-                    head++;
+//                while(head+1<tail && (gety(q[head+1],j)-gety(q[head],j)) <= k*(getx(q[head+1])-getx(q[head])))
+//                    head++;
+                int idx = find(i,j,k,head,tail-1);
                 //dp[k][j-1] - (sum[n-1] - sum[i-1]) * (sum[i-1] - sum[k-1])
-                dp[i][j] = dp[q[head]][j-1] - (sum[n-1]-sum[i-1])*(sum[i-1]-sum[q[head]-1]);
+                dp[i][j] = dp[idx][j-1] - (sum[n-1]-sum[i-1])*(sum[i-1]-sum[idx-1]);
                 //dp[i][j] = dp[q[head]][j-1] + k * sum[q[head]];
                 //dp[i][j] -= sum[n-1] - sum[i-1] + sum[i-1] * sum[i-1];
                 
